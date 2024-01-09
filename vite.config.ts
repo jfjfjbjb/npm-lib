@@ -11,7 +11,7 @@ import Components from 'unplugin-vue-components/vite';
 import { AntDesignVueResolver } from 'unplugin-vue-components/resolvers';
 import DefineOptions from 'unplugin-vue-define-options/vite';
 // import svgLoader from 'vite-svg-loader';
-import commonjs from 'vite-plugin-commonjs';
+// import commonjs from 'vite-plugin-commonjs';
 import { visualizer } from 'rollup-plugin-visualizer';
 import { resolve } from 'node:path';
 // 引入theme
@@ -66,7 +66,7 @@ export default defineConfig(({ command, mode }) => {
         ]
       }),
       DefineOptions(),
-      commonjs(),
+      // commonjs(),
       // 打包分析
       lifecycle === 'report'
         ? visualizer({ open: true, gzipSize: true, filename: 'report.html' })
@@ -96,7 +96,8 @@ export default defineConfig(({ command, mode }) => {
     },
     build: {
       lib: {
-        entry: resolve(__dirname, 'src/index.ts')
+        entry: resolve(__dirname, 'src/index.ts'),
+        name: 'MyLib'
       },
       minify: 'terser',
       terserOptions: {
@@ -108,14 +109,14 @@ export default defineConfig(({ command, mode }) => {
       },
       rollupOptions: {
         output: {
-          manualChunks(id) {
-            if (chunkIncludes(['lodash', 'lodash-es'], id)) {
-              return 'lodash';
-            }
-            if (chunkIncludes(['vue', 'vue-router', 'pinia'], id)) {
-              return 'vue-base';
-            }
-          }
+          // manualChunks(id) {
+          //   if (chunkIncludes(['lodash', 'lodash-es'], id)) {
+          //     return 'lodash';
+          //   }
+          //   if (chunkIncludes(['vue', 'vue-router', 'pinia'], id)) {
+          //     return 'vue-base';
+          //   }
+          // }
         }
       }
     }

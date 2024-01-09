@@ -1,6 +1,16 @@
 {
-  "name": "vue3-frame-ts",
+  "name": "npm-lib-tt",
   "version": "0.0.0",
+  "type": "module",
+  "files": ["dist"],
+  "main": "./dist/npm-lib-tt.umd.cjs",
+  "module": "./dist/npm-lib-tt.js",
+  "exports": {
+    ".": {
+      "import": "./dist/npm-lib-tt.js",
+      "require": "./dist/npm-lib-tt.umd.cjs"
+    }
+  },
   "scripts": {
     "start": "npm run dev",
     "dev": "vite",
