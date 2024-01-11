@@ -1,0 +1,22 @@
+# Ignore patterns.
+
+# Files
+CHANGELOG.md
+README.md
+*.md
+*.log
+
+# Folders
+node_modules/
+.git/
+.idea/
+.vscode/
+.github/
+
+# Tests
+test/
+temp/
+coverage/
+reports/
+fixtures/
+build/

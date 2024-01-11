@@ -4,7 +4,9 @@
     "env.d.ts",
     "types/*",
     "src/**/*",
-    "src/**/*.vue"
+    "src/**/*.vue",
+    "packages/**/*",
+    "packages/**/*.vue"
   ],
   "compilerOptions": {
     "allowJs": true,
@@ -13,7 +15,7 @@
     "baseUrl": ".",
     "paths": {
       "@/*": [
-        "./src/*"
+        "./*"
       ]
     },
     "module": "NodeNext",

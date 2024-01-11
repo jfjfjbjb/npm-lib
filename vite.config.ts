@@ -1,6 +1,5 @@
 /* eslint-disable no-undef */
 import { fileURLToPath, URL } from 'node:url';
-
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import vueJsx from '@vitejs/plugin-vue-jsx';
@@ -13,9 +12,11 @@ import DefineOptions from 'unplugin-vue-define-options/vite';
 // import svgLoader from 'vite-svg-loader';
 // import commonjs from 'vite-plugin-commonjs';
 import { visualizer } from 'rollup-plugin-visualizer';
-import { resolve } from 'node:path';
+import dts from 'vite-plugin-dts';
+import { resolve, relative, extname } from 'node:path';
 // 引入theme
 // import theme from './src/style/theme';
+import { glob, globSync, globStream, globStreamSync, Glob } from 'glob';
 
 // chunks相关
 const { pathname = '' } = new URL('./node_modules', import.meta.url);
@@ -47,6 +48,10 @@ export default defineConfig(({ command, mode }) => {
     },
     plugins: [
       vue(),
+      dts({
+        entryRoot: './packages',
+        outDir: ['./es', './lib']
+      }),
       vueJsx(),
       eslint({
         cache: false
@@ -74,7 +79,7 @@ export default defineConfig(({ command, mode }) => {
     ],
     resolve: {
       alias: {
-        '@': fileURLToPath(new URL('./src', import.meta.url))
+        '@': fileURLToPath(new URL('./', import.meta.url))
       }
     },
     css: {
@@ -95,9 +100,10 @@ export default defineConfig(({ command, mode }) => {
       port: 8000
     },
     build: {
+      copyPublicDir: false,
       lib: {
-        entry: resolve(__dirname, 'src/index.ts'),
-        name: 'MyLib'
+        entry: resolve(__dirname, './index.ts'),
+        name: 'npm-lib-tt'
       },
       minify: 'terser',
       terserOptions: {
@@ -108,16 +114,42 @@ export default defineConfig(({ command, mode }) => {
         }
       },
       rollupOptions: {
-        output: {
-          // manualChunks(id) {
-          //   if (chunkIncludes(['lodash', 'lodash-es'], id)) {
-          //     return 'lodash';
-          //   }
-          //   if (chunkIncludes(['vue', 'vue-router', 'pinia'], id)) {
-          //     return 'vue-base';
-          //   }
-          // }
-        }
+        // 确保外部化处理那些你不想打包进库的依赖
+        external: ['vue', 'ant-design-vue', 'lodash'],
+        input: Object.fromEntries(
+          globSync('packages/**/*.*').map((file: string) => [
+            // 这里将删除 `src/` 以及每个文件的扩展名。
+            // 因此，例如 src/nested/foo.js 会变成 nested/foo
+            relative('packages', file.slice(0, file.length - extname(file).length)),
+            // 这里可以将相对路径扩展为绝对路径，例如
+            // src/nested/foo 会变成 /project/src/nested/foo.js
+            fileURLToPath(new URL(file, import.meta.url))
+          ])
+        ),
+        output: [
+          {
+            // 打包格式
+            format: 'es',
+            // 打包文件名称
+            entryFileNames: '[name].mjs',
+            // 打包目录对应
+            // preserveModules: true,
+            exports: 'named',
+            // 打包根目录
+            dir: './es'
+          },
+          {
+            // 打包格式
+            format: 'cjs',
+            // 打包文件名称
+            entryFileNames: '[name].js',
+            // 打包目录对应
+            // preserveModules: true,
+            exports: 'named',
+            // 打包根目录
+            dir: './lib'
+          }
+        ]
       }
     }
   };
